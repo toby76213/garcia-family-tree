@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Garcia Family Tree — South Texas</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background: #080705;
+    font-family: 'EB Garamond', Georgia, serif;
+    color: #e8dcc8;
+    padding: 0 0 60px;
+  }
+
+  /* ── HERO HEADER ── */
+  .hero {
+    background: linear-gradient(180deg, #1a0f00 0%, #0d0800 100%);
+    border-bottom: 1px solid #3a2800;
+    padding: 40px 20px 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, #b5832a18 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 13px; letter-spacing: 7px; color: #d4982e;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  .hero h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(30px, 5vw, 54px);
+    font-weight: 600; color: #faefc0;
+    letter-spacing: 4px; margin-bottom: 6px;
+  }
+  .hero-sub {
+    font-size: 19px; color: #c89050; font-style: italic;
+    letter-spacing: 1px; margin-bottom: 18px;
+  }
+  .hero-divider {
+    width: 200px; height: 1px;
+    background: linear-gradient(90deg, transparent, #b5832a, transparent);
+    margin: 0 auto 16px;
+  }
+  .hero-stats {
+    display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;
+    font-size: 16px; color: #c09060; letter-spacing: 2px;
+  }
+  .hero-stats span { text-transform: uppercase; }
+  .hero-stats strong { color: #e8b030; font-style: normal; }
+
+  /* ── LAYOUT ── */
+  .main-layout {
+    display: flex; gap: 0;
+    max-width: 1400px; margin: 0 auto;
+    padding: 0;
+  }
+
+  /* ── TIMELINE SIDEBAR ── */
+  .timeline-sidebar {
+    width: 260px; min-width: 220px; flex-shrink: 0;
+    background: #0d0a06;
+    border-right: 1px solid #2a1e08;
+    padding: 28px 0;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  .sidebar-title {
+    font-family: 'Cinzel', serif;
+    font-size: 12px; letter-spacing: 5px; color: #a07840;
+    text-transform: uppercase; padding: 0 20px 14px;
+    border-bottom: 1px solid #1e1408;
+    margin-bottom: 16px;
+  }
+  .era-btn {
+    display: block; width: 100%;
+    padding: 14px 20px; text-align: left;
+    background: transparent; border: none; cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.2s; color: inherit;
+    font-family: 'EB Garamond', serif;
+  }
+  .era-btn:hover { background: rgba(181,131,42,0.06); }
+  .era-btn.active { background: rgba(181,131,42,0.10); }
+  .era-btn .era-year {
+    font-family: 'Cinzel', serif;
+    font-size: 15px; font-weight: 600; display: block; margin-bottom: 3px;
+  }
+  .era-btn .era-name {
+    font-size: 13px; color: #b08050; display: block; margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+  .era-btn .era-desc {
+    font-size: 13px; line-height: 1.6; color: #907050;
+    font-style: italic; display: none;
+  }
+  .era-btn.active .era-desc { display: block; color: #c0a070; }
+
+  /* ── TREE AREA ── */
+  .tree-area {
+    flex: 1; padding: 32px 24px;
+    overflow-x: auto;
+  }
+
+  /* ── GENERATION BLOCK ── */
+  .gen-block { margin-bottom: 0; }
+  .gen-connector {
+    display: flex; flex-direction: column; align-items: center;
+    margin: 4px 0;
+  }
+  .gen-connector-line {
+    width: 1px; height: 24px;
+  }
+  .gen-era-tag {
+    font-family: 'Cinzel', serif;
+    font-size: 12px; letter-spacing: 4px; text-transform: uppercase;
+    color: #907050; margin: 5px 0 10px; text-align: center;
+  }
+
+  /* branch lines connecting siblings */
+  .branch-row {
+    position: relative;
+    display: flex; justify-content: center;
+    gap: 12px; flex-wrap: nowrap;
+    padding: 0 8px;
+  }
+  .branch-row::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    height: 1px;
+    background: #2a1e08;
+    width: calc(100% - 80px);
+    display: none;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid #221808;
+    border-radius: 2px;
+    padding: 16px 20px;
+    cursor: pointer;
+    min-width: 165px; max-width: 210px;
+    text-align: center;
+    transition: all 0.2s;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .card:hover { background: rgba(181,131,42,0.06); transform: translateY(-2px); }
+  .card.selected { transform: translateY(-3px); }
+  .card.spouse-card {
+    border-style: dashed;
+    opacity: 0.85;
+  }
+  .card .badge {
+    position: absolute; top: -9px; left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Cinzel', serif;
+    font-size: 9px; padding: 2px 8px;
+    letter-spacing: 2px; text-transform: uppercase;
+    border-radius: 1px; white-space: nowrap;
+    background: #b5832a; color: #000;
+  }
+  .card .card-name {
+    font-size: 16px; margin-bottom: 4px; line-height: 1.3;
+  }
+  .card .card-role {
+    font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .card .card-year {
+    font-size: 13px; font-style: italic;
+  }
+  .card .card-note {
+    font-size: 12px; margin-top: 5px; font-style: italic;
+    opacity: 0.7; line-height: 1.3;
+  }
+
+  /* spouse connector */
+  .couple-row {
+    display: flex; align-items: center; justify-content: center; gap: 0;
+  }
+  .spouse-link {
+    font-size: 11px; color: #403020; padding: 0 6px;
+    position: relative; top: -6px;
+  }
+
+  /* ── DETAIL PANEL ── */
+  .detail-panel {
+    margin: 28px 0 0;
+    background: rgba(255,255,255,0.025);
+    border-radius: 3px; padding: 24px 28px;
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .dp-era { font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 6px; }
+  .dp-role { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 6px; color: #c0a070; }
+  .dp-name { font-family: 'Cinzel', serif; font-size: 28px; margin-bottom: 12px; font-weight: 600; }
+  .dp-line { width: 40px; height: 1px; margin-bottom: 14px; }
+  .dp-text { font-size: 17px; line-height: 1.9; color: #d0b888; margin-bottom: 14px; }
+  .dp-links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .dp-link {
+    font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+    padding: 7px 14px; border-radius: 1px; text-decoration: none;
+    font-family: 'Cinzel', serif; transition: all 0.2s;
+    display: inline-block;
+  }
+  .dp-link:hover { opacity: 0.8; }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex; gap: 20px; flex-wrap: wrap;
+    padding: 16px 24px;
+    border-top: 1px solid #1a1208;
+    font-size: 14px; color: #907050;
+    letter-spacing: 1px;
+    align-items: center;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-box { width: 20px; height: 12px; border-radius: 1px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 700px) {
+    .timeline-sidebar { display: none; }
+    .branch-row { flex-wrap: wrap; }
+    .card { min-width: 120px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Ancestral Record · South Texas</div>
+  <h1>The Garcia Family</h1>
+  <div class="hero-sub">Ranchers, Pioneers & Advocates of the Rio Grande</div>
+  <div class="hero-divider"></div>
+  <div class="hero-stats">
+    <span>Est. <strong>1740</strong></span>
+    <span>Land Grant: <strong>250,000+ acres</strong></span>
+    <span>Counties: <strong>Starr &amp; Brooks, Texas</strong></span>
+    <span>Generations: <strong>6+</strong></span>
+    <span>Died: <strong>Feb 7, 1988</strong></span>
+  </div>
+</div>
+
+<div class="main-layout">
+
+  <!-- SIDEBAR TIMELINE -->
+  <aside class="timeline-sidebar">
+    <div class="sidebar-title">Historical Eras</div>
+    <div id="era-buttons"></div>
+  </aside>
+
+  <!-- TREE -->
+  <div class="tree-area">
+    <div id="tree"></div>
+    <div class="detail-panel" id="detail">
+      <div class="dp-era" id="dp-era"></div>
+      <div class="dp-role" id="dp-role"></div>
+      <div class="dp-name" id="dp-name"></div>
+      <div class="dp-line" id="dp-line"></div>
+      <div class="dp-text" id="dp-text"></div>
+      <div class="dp-links" id="dp-links"></div>
+    </div>
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-box" style="background:#b5832a22;border:1px solid #b5832a"></div>
+        <span>Primary family member</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-box" style="background:#333;border:1px dashed #666"></div>
+        <span>Spouse (married in)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-box" style="background:#b5832a;border:1px solid #b5832a"></div>
+        <span>★ Subject: Esteban Garcia</span>
+      </div>
+      <div class="legend-item" style="margin-left:auto;font-style:italic">
+        Click any card for details
+      </div>
+    </div>
+  </div>
+
+</div>
+<!-- ══════ MAP SECTION ══════ -->
+<div style="margin:32px 24px 0 24px;">
+  <div style="background:#1a1a2e;border:1px solid #3a3a5c;border-radius:12px;overflow:hidden;">
+    <div style="padding:18px 24px 12px;border-bottom:1px solid #3a3a5c;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <span style="font-size:20px;">🗺️</span>
+      <h2 style="margin:0;font-size:1.15rem;color:#e8d5a3;font-family:Georgia,serif;letter-spacing:0.03em;">Garcia Family Land — South Texas & Tamaulipas</h2>
+      <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;" id="map-filter-btns">
+        <button onclick="filterMap('all')" id="btn-all" style="padding:5px 14px;border-radius:20px;border:none;background:#4a88d0;color:#fff;cursor:pointer;font-size:0.82rem;font-weight:600;">All Sites</button>
+        <button onclick="filterMap('ranch')" id="btn-ranch" style="padding:5px 14px;border-radius:20px;border:none;background:#2a2a4a;color:#aaa;cursor:pointer;font-size:0.82rem;">Ranches</button>
+        <button onclick="filterMap('origin')" id="btn-origin" style="padding:5px 14px;border-radius:20px;border:none;background:#2a2a4a;color:#aaa;cursor:pointer;font-size:0.82rem;">Family Origins</button>
+        <button onclick="filterMap('legal')" id="btn-legal" style="padding:5px 14px;border-radius:20px;border:none;background:#2a2a4a;color:#aaa;cursor:pointer;font-size:0.82rem;">Land Grants</button>
+      </div>
+    </div>
+    <!-- Map container -->
+    <div id="garcia-map" style="width:100%;height:480px;background:#0d0d1a;"></div>
+    <!-- Legend -->
+    <div style="padding:14px 24px;display:flex;gap:20px;flex-wrap:wrap;border-top:1px solid #3a3a5c;">
+      <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:#aaa;">
+        <span style="width:12px;height:12px;border-radius:50%;background:#e8d5a3;display:inline-block;"></span> Family Origin / Home
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:#aaa;">
+        <span style="width:12px;height:12px;border-radius:50%;background:#4a88d0;display:inline-block;"></span> Ranch / Land Holdings
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:#aaa;">
+        <span style="width:12px;height:12px;border-radius:50%;background:#c8860a;display:inline-block;"></span> Spanish Land Grant
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:#aaa;">
+        <span style="width:12px;height:12px;border-radius:50%;background:#7a9a50;display:inline-block;"></span> Key Historic Event
+      </div>
+      <div style="margin-left:auto;font-size:0.75rem;color:#666;font-style:italic;">
+        Source: TSHA, 1935 Jim Hogg Co. Enterprise, 1900 U.S. Census
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+// ══════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════
+const ERAS = [
+  {
+    id: 'spanish',
+    year: 'c. 1638–1749',
+    name: 'Spanish Exploration',
+    color: '#c8860a',
+    desc: 'Spanish explorers first charted the Rio Grande region. In 1749 José de Escandón colonized Nuevo Santander, founding Camargo. The Garcías settled among these earliest colonists.',
+    links: [
+      { label: 'Starr County History', url: 'https://www.tshaonline.org/handbook/entries/starr-county' },
+      { label: 'Spanish Land Grants', url: 'https://www.tshaonline.org/handbook/entries/land-grants' }
+    ]
+  },
+  {
+    id: 'grant',
+    year: '1740',
+    name: 'Royal Land Grant',
+    color: '#b5832a',
+    desc: 'The Garcia family received a Royal Land Grant from the King of Spain totaling over 250,000 acres on both sides of the Rio Grande — one of the largest private grants in the region.',
+    links: [
+      { label: 'Land Grant Records (UTRGV)', url: 'https://utrgv.libguides.com/SCA/landgrants' },
+      { label: 'Garcia Family Entry (TSHA)', url: 'https://www.tshaonline.org/handbook/entries/garcia-esteban' }
+    ]
+  },
+  {
+    id: 'republic',
+    year: '1827–1848',
+    name: 'Republic & Border Era',
+    color: '#a07840',
+    desc: 'Eligio Garcia took over ranch management in 1827. Texas won independence in 1836. The Treaty of Guadalupe Hidalgo (1848) ended the Mexican-American War and formally recognized Spanish land grants.',
+    links: [
+      { label: 'Treaty of Guadalupe Hidalgo', url: 'https://www.loc.gov/rr/hispanic/ghtreaty/' }
+    ]
+  },
+  {
+    id: 'consolidation',
+    year: '1870s–1913',
+    name: 'Ranch Consolidation',
+    color: '#7a9a50',
+    desc: 'Amancio Garcia managed the Tacubaya Ranch in Brooks County and Artecitas Ranch on the Rio Grande, approximately 4 miles east of La Grulla in Starr County (confirmed on the 1935 Starr County map). The Artecitas Ranch Cemetery — a small family/worker burial ground later rediscovered as a &quot;lost cemetery&quot; — is located on the former ranch property. Brooks County was itself carved from Starr County in 1911.',
+    links: [
+      { label: 'Brooks County History', url: 'https://www.tshaonline.org/handbook/entries/brooks-county' },
+      { label: 'Brahman Cattle in Texas', url: 'https://www.tshaonline.org/handbook/entries/brahman-cattle' }
+    ]
+  },
+  {
+    id: 'pioneer',
+    year: '1896–1952',
+    name: 'Pioneer Generation',
+    color: '#4a88d0',
+    desc: 'Esteban Garcia built the largest Hispanic ranching operation in South Texas, bred superior Brahman cattle, fought Standard Oil for royalties, desegregated McAllen, and brokered a US-Mexico disease treaty.',
+    links: [
+      { label: 'Full Biography (TSHA)', url: 'https://www.tshaonline.org/handbook/entries/garcia-esteban' },
+      { label: 'Pan American Zebu Assoc.', url: 'https://www.zebu.org/' },
+      { label: 'King Ranch History', url: 'https://www.tshaonline.org/handbook/entries/king-ranch' }
+    ]
+  },
+  {
+    id: 'modern',
+    year: '1920s–Present',
+    name: 'Modern Legacy',
+    color: '#38a8b0',
+    desc: 'Esteban\'s six children carried on the ranching tradition. His grandson Esteban Garcia III and great-grandson Eddie Garcia (6th generation) continue operating livestock businesses in South Texas today.',
+    links: [
+      { label: 'Gulf Coast Livestock Auction', url: 'https://www.lmaweb.com/NewsAndMedia/Articles/gcla' },
+      { label: 'Intl. Zebu Breeders Assoc.', url: 'https://www.zebu.org/' }
+    ]
+  }
+];
+
+const GEN_CONFIG = {
+  6: { eraId: 'spanish',      label: 'Pre-1740  ·  Spanish Colonial Roots',    color: '#c8860a' },
+  5: { eraId: 'grant',        label: '1740  ·  Royal Land Grant Era',            color: '#b5832a' },
+  4: { eraId: 'republic',     label: '1827  ·  Republic & Border Era',           color: '#a07840' },
+  3: { eraId: 'consolidation',label: '1870s  ·  Ranch Consolidation',           color: '#7a9a50' },
+  2: { eraId: 'pioneer',      label: '1896  ·  Pioneer Generation',             color: '#4a88d0' },
+  1: { eraId: 'modern',       label: '1920s–Present  ·  Modern Legacy',         color: '#38a8b0' },
+};
+
+const PEOPLE = [
+  // Gen 6 — Pre-colonial roots
+  { id:'escandon', name:'José de Escandón', role:'Spanish Colonial Governor', gen:6, year:'1700–1770', spouse:false,
+    details:'Spanish military officer and colonial administrator who founded the province of Nuevo Santander in 1748–49, establishing the town of Camargo where the Garcia family would settle. His colonization program brought many founding families — including the Garcías — to the Rio Grande region.',
+    links:[{label:'Escandón (TSHA)', url:'https://www.tshaonline.org/handbook/entries/escandon-jose-de'}]
+  },
+  { id:'blas', name:'Blas de la Garza Falcón', role:'Camargo Founder / Ancestor',  gen:6, year:'c.1700–1760', spouse:false,
+    details:'Captain and founding colonist of Camargo (1749). Father of Gertrudis de la Garza Falcón. The de la Garza family was one of the most prominent founding families of the lower Rio Grande, and is an ancestral line connected to Esteban\'s mother Braulia de la Garza.',
+    links:[{label:'de la Garza Falcón (TSHA)', url:'https://www.tshaonline.org/handbook/entries/garza-falcon-maria-gertrudis-de-la'}]
+  },
+
+
+  // Gen 4 — Eligio's siblings (confirmed by genealogy record and 1935 newspaper)
+  { id:'francisco_garcia', name:'Francisco Garcia Treviño', role:"Eligio's Brother", gen:4, year:'c. 1829–?', spouse:false,
+    details:'Brother of Eligio Garcia Treviño; son of Luis Garcia Longoria and Encarnación Garcia (born Treviño). The February 14, 1935 legal notice in the Jim Hogg County Enterprise names "Francisco Garcia Trevino and unknown heirs" as a party to a land proceeding in Jim Hogg County, Texas — confirming he held land adjacent to the Garcia family\'s Starr and Brooks County holdings.',
+    links:[{label:'Jim Hogg Co. Enterprise, Feb 14 1935 (OldNews)', url:'https://www.oldnews.com'}]
+  },
+  { id:'hilaria_garcia', name:'Hilaria Izaguirre Longoria', role:"Eligio's Sister", gen:4, year:'c. 1835–?', spouse:false,
+    details:'Sister of Eligio Garcia Treviño; born Garcia Treviño, daughter of Luis Garcia Longoria and Encarnación Garcia (born Treviño). Married into the Izaguirre family — a significant border family in the Camargo/Mier region. Note: Braulia de la Garza, who would later marry Eligio\'s son Amancio, carried the Izaguirre surname in her ancestry, suggesting a possible kinship connection between these two families.',
+    links:[]
+  },
+  { id:'mariajuliana_garcia', name:'María Juliana Izaguirre Longoria', role:"Eligio's Sister", gen:4, year:'c. 1837–?', spouse:false,
+    details:'Sister of Eligio Garcia Treviño; born Garcia Treviño, daughter of Luis Garcia Longoria and Encarnación Garcia (born Treviño). Like her sister Hilaria, she married into the Izaguirre family.',
+    links:[]
+  },
+
+  // Gen 5 — Land grant patriarch
+  { id:'luis_longoria', name:'Luis Garcia Longoria', role:'Great-Grandfather', gen:5, year:'c. 1800–?', spouse:false,
+    details:'Father of Eligio Garcia Treviño and his siblings. His full name — Luis Garcia Longoria — reflects the deeply intertwined founding families of Camargo, Tamaulipas: the Garcia and Longoria lines both trace back to the original 1749 colonists under José de Escandón. A February 14, 1935 legal summons published in the Jim Hogg County Enterprise names \'Luis Garcia Longoria and unknown heirs\' alongside his son Eligio, son Francisco, and their mother Encarnación — as defendants in a title suit over the Las Animas Spanish land grant (Jim Hogg County, Texas). Historical land grant records confirm the Las Animas grant in Jim Hogg County was originally awarded to \'Garcia y Garza, Nicolas and Bruno\' at 66,426 acres — establishing the Garcia family\'s land holdings across Starr, Brooks, and Jim Hogg Counties. The Longoria surname connects to Juan Diego Longoria, one of Camargo\'s original founding settlers in 1749.',
+    links:[{label:'Longoria Founding Family of Camargo', url:'https://www.geni.com/people/Juan-Diego-Longoria-Garc%C3%ADa/6000000000307810410'},{label:'Las Villas del Norte Camargo Records', url:'https://lasvillasdelnorte.com/camargo-tamaulipas-genealogy-and-history/'},{label:'Jim Hogg Co. Enterprise, Feb 14 1935 (OldNews)', url:'https://www.oldnews.com'}]
+  },
+  { id:'encarnacion_trevino', name:'Encarnación Garcia (born Treviño)', role:'Great-Grandmother', gen:5, year:'c. 1805–?', spouse:true,
+    details:'Mother of Eligio Garcia Treviño and his siblings Francisco, Hilaria, and María Juliana. Born with the surname Treviño — one of the most prominent founding families of the Las Villas del Norte region — she married into the Garcia Longoria family. The 1935 Jim Hogg County Enterprise legal notice lists "Encarnacion Trevino and unknown heirs," confirming she was a recognized landholder in her own right. The Treviño surname along the lower Rio Grande dates back to colonial settlement, and her children carried the combined heritage of both Garcia and Treviño lines — hence the surname "Garcia Treviño" that Eligio and his siblings bore.',
+    links:[{label:'Las Villas del Norte Camargo Records', url:'https://lasvillasdelnorte.com/camargo-tamaulipas-genealogy-and-history/'}]
+  },
+  { id:'original_grantee', name:'Garcia Family Patriarch', role:'Original Land Grantee', gen:6, year:'c. 1710–1780', spouse:false,
+    details:'Received the original Royal Land Grant from the King of Spain in 1740. The grant encompassed over 250,000 acres on both sides of the Rio Grande in what is now Starr and Brooks Counties, Texas — one of the largest private land grants in the region. This was part of the broader colonization of Nuevo Santander under Governor José de Escandón. Likely the father or grandfather of Luis Garcia Longoria.',
+    links:[{label:'Land Grants (TSHA)', url:'https://www.tshaonline.org/handbook/entries/land-grants'},{label:'Starr County History', url:'https://www.tshaonline.org/handbook/entries/starr-county'}]
+  },
+
+  // Gen 4 — Grandfather
+  { id:'eligio_sr', name:'Eligio Garcia Treviño', role:'Grandfather', gen:4, year:'c. 1831 – Dec 4, 1908', spouse:false,
+    details:'Born circa 1831 in Camargo, Tamaulipas, Mexico. Son of Luis Garcia Longoria and Encarnación Garcia (born Treviño). Married María Guadalupe Garcia Peña circa 1860 in Camargo, Tamaulipas. Died December 4, 1908, in Camargo, Tamaulipas. His children included Amancio García (father of Esteban), Luis G. Garcia, Rita G. Garcia, San Juana G. Garcia, and Dr. José Garcia Garcia. His siblings were Francisco Garcia Treviño, Hilaria Izaguirre Longoria (born Garcia Treviño), and María Juliana Izaguirre Longoria (born Garcia Treviño). A February 14, 1935 legal notice in the Jim Hogg County Enterprise (Hebbronville, TX) names \'Eligio Garcia Trevino and unknown heirs\' alongside \'Luis Garcia Longoria and unknown heirs\' — independently confirming this family held land in Jim Hogg County, adjacent to the Garcia family\'s known Starr and Brooks County holdings. In 1827 he took over active management of the Garcia ranch holdings in what is now Starr and Brooks Counties. His tenure coincided with the Texas Revolution of 1835–36. When Texas declared independence and claimed the Rio Grande as its border, his land fell into a legal gray zone; Tamaulipas continued issuing titles until 1848. Eligio successfully kept the Garcia ranches intact through Mexican rule, the Republic of Texas, and U.S. statehood.',
+    links:[{label:'Brooks County (TSHA)', url:'https://www.tshaonline.org/handbook/entries/brooks-county'},
+
+  { id:'guadalupe_garcia', name:'María Guadalupe Garcia Treviño', role:'Wife of Eligio', gen:4, year:'c. 1840–?', spouse:true,
+    details:'Born circa 1840, Camargo, Tamaulipas, Mexico. Born María Guadalupe Garcia Peña; married Eligio Garcia Treviño circa 1860 in Camargo. Her children included Amancio García (father of Esteban Garcia), Luis G. Garcia, Rita G. Garcia, San Juana G. Garcia, and Dr. José Garcia Garcia.',
+    links:[]
+  },
+{label:'Tejano Role in TX Revolution', url:'https://www.battlefields.org/learn/head-tilting-history/tejano-heroes-texas-revolution'},{label:'Land Grant Adjudication', url:'https://www.tshaonline.org/handbook/entries/mexican-american-land-grant-adjudication'},{label:'Jim Hogg Co. Enterprise, Feb 14 1935 (OldNews)', url:'https://www.oldnews.com'}]
+  },
+
+  // Gen 3 — Parents + siblings of Esteban's father
+  { id:'amancio', name:'Amancio Garcia', role:'Father', gen:3, year:'Apr 1862–1923', spouse:false,
+    details:'Born April 1862 in Mexico. Immigrated to the United States in 1879 and settled in Starr County, Texas. The 1900 U.S. Federal Census (Justice Precinct 5, Starr County) records him as a farmer, age 38, living with wife Braulia and four children — including 4-year-old Esteban. He and Braulia also raised two adopted children: Guadalupe Gonzales (age 8) and Leonardo Martinez (age 5). Married Braulia circa 1895. In 1913 moved the family to the Artecitas Ranch on the banks of the Rio Grande, near La Grulla in Starr County — part of the original Spanish land grant. Became gravely ill, prompting Esteban to leave school in sixth grade. Died in 1923, leaving Esteban to take over the ranch and its inherited debts.',
+    links:[{label:'1900 U.S. Census Record', url:'https://www.myheritage.com/research/record-10131-57025906-/amancio-garcia-in-1900-united-states-federal-census'}]
+  },
+  { id:'braulia', name:'Braulia de la Garza', role:'Mother', gen:3, year:'c. 1873–?', spouse:true,
+    details:'Born circa 1873 in Mexico. The 1900 U.S. Federal Census lists her as age 27, wife of Amancio Garcia, living in Justice Precinct 5, Starr County, Texas. She was notably younger than Amancio — about 11 years his junior. They married circa 1895. By 1900 she had four children with Amancio and also helped raise two adopted children. She went on to have thirteen children in total, Esteban being the eldest. Part of the de la Garza lineage — one of the founding colonial families of Camargo, Tamaulipas, with roots along the Rio Grande dating back to the 1749 Escandón colonization.',
+    links:[{label:'1900 U.S. Census Record', url:'https://www.myheritage.com/research/record-10131-57025906-/amancio-garcia-in-1900-united-states-federal-census'}]
+  },
+
+  // Gen 2 — Esteban + his siblings + his wives
+  { id:'esteban', name:'Esteban Garcia', role:'Pioneer Rancher', gen:2, year:'Dec 2, 1896 – Feb 7, 1988', highlight:true, spouse:false,
+    details:'Born in Camargo, Tamaulipas, Mexico. The eldest of thirteen children. Took over the family\'s Tacubaya Ranch in Brooks County after his father\'s death in 1923. Rose to become the largest Hispanic rancher in South Texas. In 1932 partnered with brother Eligio to build a superior Brahman herd. In 1935 moved family to McAllen; desegregated the public swimming pool after his children were turned away. Refused Standard Oil lease terms until royalties were guaranteed for all area ranchers. Imported 13 Zebu cattle from Brazil in 1946; co-founded the Pan American Zebu Association. Helped broker the 1947 Truman-Alemán agreement to halt foot-and-mouth disease. In 1952 helped Westinghouse secure an $18M canal contract with Mexico. Married twice: María Salomé Izaguirre (1920) and María Elizondo (1952). Died February 7, 1988 in Rio Grande City.',
+    links:[
+      {label:'Full Biography (TSHA)', url:'https://www.tshaonline.org/handbook/entries/garcia-esteban'},
+      {label:'Cattle Raisers Museum', url:'https://texashistory.unt.edu/ark:/67531/metapth43132/'},
+      {label:'Zebu Breeders Association', url:'https://www.zebu.org/'}
+    ]
+  },
+  { id:'salome', name:'María Salomé Izaguirre', role:'First Wife (m. 1920)', gen:2, year:'c. 1898–?', spouse:true,
+    details:'Born in Camargo, Tamaulipas, Mexico, like her husband Esteban. Married Esteban Garcia in 1920. Together they had six children. She accompanied the family when Esteban moved from the Tacubaya Ranch to McAllen in 1935 for the children\'s education.',
+    links:[]
+  },
+  { id:'maria_e', name:'María Elizondo', role:'Second Wife (m. 1952)', gen:2, year:'c. 1910–?', spouse:true,
+    details:'Also from Camargo, Tamaulipas. Married Esteban Garcia in 1952, following the death of his first wife. Esteban was 56 at the time of their marriage. She was with him in his later years as he continued his civic and ranching work.',
+    links:[]
+  },
+  { id:'eligio_jr', name:'Eligio Garcia', role:'Brother & Ranching Partner', gen:2, year:'c. 1900–?', spouse:false,
+    details:'Esteban\'s brother and closest business partner. Together from 1932 they acquired domestic and Mexican Brahman cattle, building a herd considered superior in the United States by 1940. In 1946 co-imported 13 Zebu cattle from Brazil, helping establish a newly registered breed recognized by the American Brahman Breeders Association. Based at Encino, Texas.',
+    links:[{label:'Cattle Raisers Museum Photo (1957)', url:'https://texashistory.unt.edu/ark:/67531/metapth43132/'}]
+  },
+  { id:'siblings', name:'Known & Unknown Siblings', role:'Brothers & Sisters', gen:2, year:'c. 1897–1920', spouse:false,
+    details:'The 1900 U.S. Federal Census names Esteban\'s siblings present at that time: Francisca Garcia (born Dec 1897), Concepción Garcia (born Dec 1898), and Eutiguio Garcia (born 1900). The family also had two adopted children living with them: Guadalupe Gonzales (age 8) and Leonardo Martinez (age 5). Esteban went on to have twelve more brothers and sisters born after 1900 — thirteen children in total — though their individual names are not fully documented in available public records.',
+    links:[]
+  },
+
+  // Gen 1 — Esteban's six children
+  { id:'alicia', name:'Alicia Garcia', role:'Eldest Daughter', gen:1, year:'c. 1921–?', spouse:false,
+    details:'Esteban\'s eldest daughter. In 1935, after the family moved to McAllen, Alicia was denied admittance to the public swimming pool because of her race. Her father\'s fierce reaction — calling politicians and threatening a commercial boycott — led directly to the pool\'s desegregation within weeks. A defining moment in South Texas civil rights history.',
+    links:[{label:'Garcia Family (TSHA)', url:'https://www.tshaonline.org/handbook/entries/garcia-esteban'}]
+  },
+  { id:'esteban_jr', name:'Esteban Garcia Jr.', role:'Son', gen:1, year:'c. 1923–?', spouse:false,
+    details:'Also denied entry to the McAllen public swimming pool alongside his sister Alicia, galvanizing their father\'s civil rights activism. Later part of the Garcia ranching legacy in South Texas.',
+    links:[]
+  },
+  { id:'esteban_iii', name:'Esteban Garcia III', role:'Son / 5th-Gen Rancher', gen:1, year:'c. 1925–?', spouse:false,
+    details:'Continued the family ranching tradition into the modern era. Father of Eddie Garcia, a sixth-generation cattleman who became owner of Gulf Coast Livestock Auction (GCLA). Esteban III worked livestock markets in the South Texas area, purchasing cattle shipped to Mexico, carrying on the cross-border ranching heritage established by his father.',
+    links:[{label:'Eddie Garcia / GCLA', url:'https://www.lmaweb.com/NewsAndMedia/Articles/gcla'}]
+  },
+  { id:'child4', name:'Child (name unrecorded)', role:'Son or Daughter', gen:1, year:'c. 1926–?', spouse:false,
+    details:'One of Esteban\'s six children by his first wife María Salomé Izaguirre. Full names and details of all six children are not completely documented in available historical records.',
+    links:[]
+  },
+  { id:'child5', name:'Child (name unrecorded)', role:'Son or Daughter', gen:1, year:'c. 1928–?', spouse:false,
+    details:'One of Esteban\'s six children. The family was moved from Tacubaya Ranch to McAllen in 1935 specifically so all the children could receive a better education.',
+    links:[]
+  },
+  { id:'child6', name:'Child (name unrecorded)', role:'Son or Daughter', gen:1, year:'c. 1930–?', spouse:false,
+    details:'One of Esteban\'s six children. The Garcia children grew up witnessing their father\'s activism, ranching leadership, and diplomatic work — experiences that shaped the family\'s continued prominence in South Texas civic and ranching life.',
+    links:[]
+  },
+
+  // Gen 0 — 6th generation
+  { id:'eddie', name:'Eddie Garcia', role:'6th-Generation Cattleman', gen:0, year:'c. 1965–Present', spouse:false,
+    details:'Son of Esteban Garcia III, making him a sixth-generation cattleman in an unbroken line stretching back to the 1740 Spanish land grant. Eddie worked under his father visiting livestock markets, purchasing cattle shipped to Mexico. He later managed the livestock barn in Rio Grande City before becoming owner of Gulf Coast Livestock Auction (GCLA). His business motto: "See you at the gate!" — greeting every customer personally.',
+    links:[{label:'Eddie Garcia / GCLA Profile', url:'https://www.lmaweb.com/NewsAndMedia/Articles/gcla'}]
+  },
+];
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let selected = 'esteban';
+let activeEra = 'pioneer';
+
+// ══════════════════════════════════════════════
+// RENDER SIDEBAR
+// ══════════════════════════════════════════════
+function renderSidebar() {
+  const container = document.getElementById('era-buttons');
+  container.innerHTML = '';
+  ERAS.forEach(era => {
+    const btn = document.createElement('button');
+    btn.className = 'era-btn' + (era.id === activeEra ? ' active' : '');
+    btn.style.borderLeftColor = era.id === activeEra ? era.color : 'transparent';
+    btn.innerHTML = `
+      <span class="era-year" style="color:${era.color}">${era.year}</span>
+      <span class="era-name">${era.name}</span>
+      <span class="era-desc">${era.desc}
+        ${era.links.map(l => `<br/><a href="${l.url}" target="_blank" style="color:${era.color};font-style:normal;font-size:13px">${l.label} ↗</a>`).join('')}
+      </span>
+    `;
+    btn.addEventListener('click', () => {
+      activeEra = era.id;
+      renderSidebar();
+    });
+    container.appendChild(btn);
+  });
+}
+
+// ══════════════════════════════════════════════
+// RENDER TREE
+// ══════════════════════════════════════════════
+function renderTree() {
+  const tree = document.getElementById('tree');
+  tree.innerHTML = '';
+
+  const generations = [6, 5, 4, 3, 2, 1, 0];
+
+  generations.forEach((gen, gi) => {
+    const cfg = GEN_CONFIG[gen] || { label: '', color: '#38a8b0' };
+    const row = PEOPLE.filter(p => p.gen === gen);
+    if (!row.length) return;
+
+    // connector from above
+    if (gi > 0) {
+      const prevGen = generations[gi - 1];
+      const prevColor = (GEN_CONFIG[prevGen] || cfg).color;
+      const connDiv = document.createElement('div');
+      connDiv.className = 'gen-connector';
+      connDiv.innerHTML = `
+        <div class="gen-connector-line" style="background:linear-gradient(180deg,${prevColor},${cfg.color})"></div>
+        ${cfg.label ? `<div class="gen-era-tag" style="color:${cfg.color}aa">${cfg.label}</div>` : ''}
+      `;
+      tree.appendChild(connDiv);
+    } else {
+      if (cfg.label) {
+        const lbl = document.createElement('div');
+        lbl.className = 'gen-era-tag';
+        lbl.style.color = cfg.color + 'aa';
+        lbl.textContent = cfg.label;
+        tree.appendChild(lbl);
+      }
+    }
+
+    // cards row
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'branch-row';
+
+    row.forEach(person => {
+      const isSel = selected === person.id;
+      const card = document.createElement('div');
+      card.className = 'card' + (person.spouse ? ' spouse-card' : '') + (isSel ? ' selected' : '');
+      card.style.borderColor = isSel ? cfg.color : (person.highlight ? '#b5832a66' : person.spouse ? '#3a3020' : '#221808');
+      card.style.background = isSel ? `${cfg.color}18` : person.highlight ? '#b5832a0a' : 'rgba(255,255,255,0.02)';
+      card.style.boxShadow = isSel ? `0 0 22px ${cfg.color}35` : person.highlight ? '0 0 12px #b5832a20' : 'none';
+
+      card.innerHTML = `
+        ${person.highlight ? '<div class="badge">★ Subject</div>' : ''}
+        <div class="card-name" style="color:${isSel ? cfg.color : '#f0d090'};font-weight:${person.highlight?'600':'400'}">${person.name}</div>
+        <div class="card-role" style="color:${isSel ? cfg.color+'ff' : person.spouse ? '#907860' : '#b09070'}">${person.role}</div>
+        <div class="card-year" style="color:${isSel ? cfg.color+'cc' : '#908060'}">${person.year}</div>
+        ${person.spouse ? '<div class="card-note">married in</div>' : ''}
+      `;
+
+      card.addEventListener('click', () => {
+        selected = person.id;
+        // update era highlight to match generation
+        const eraId = cfg.eraId;
+        if (eraId) { activeEra = eraId; renderSidebar(); }
+        renderTree();
+        showDetail(person, cfg);
+      });
+
+      rowDiv.appendChild(card);
+    });
+
+    tree.appendChild(rowDiv);
+  });
+
+  // show detail for current selection
+  const sel = PEOPLE.find(p => p.id === selected);
+  if (sel) {
+    const genCfg = GEN_CONFIG[sel.gen] || { color: '#38a8b0', label: '' };
+    showDetail(sel, genCfg);
+  }
+}
+
+// ══════════════════════════════════════════════
+// SHOW DETAIL
+// ══════════════════════════════════════════════
+function showDetail(person, cfg) {
+  const panel = document.getElementById('detail');
+  panel.style.display = 'block';
+  panel.style.border = `1px solid ${cfg.color}44`;
+  panel.style.boxShadow = `0 0 30px ${cfg.color}12`;
+
+  const era = ERAS.find(e => e.id === cfg.eraId) || {};
+
+  document.getElementById('dp-era').style.color = cfg.color;
+  document.getElementById('dp-era').textContent = era.name || cfg.label || '';
+  document.getElementById('dp-role').style.color = cfg.color + 'aa';
+  document.getElementById('dp-role').textContent = person.role;
+  document.getElementById('dp-name').style.color = cfg.color;
+  document.getElementById('dp-name').textContent = person.name;
+  document.getElementById('dp-line').style.background = cfg.color;
+  document.getElementById('dp-text').textContent = person.details;
+
+  const linksDiv = document.getElementById('dp-links');
+  linksDiv.innerHTML = '';
+  if (person.links && person.links.length) {
+    person.links.forEach(l => {
+      const a = document.createElement('a');
+      a.href = l.url;
+      a.target = '_blank';
+      a.className = 'dp-link';
+      a.textContent = l.label + ' ↗';
+      a.style.background = cfg.color + '22';
+      a.style.color = cfg.color;
+      a.style.border = `1px solid ${cfg.color}55`;
+      linksDiv.appendChild(a);
+    });
+  }
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+renderSidebar();
+renderTree();
+
+
+// ══════════════════════════════════════════════════════
+// MAP — Leaflet.js
+// ══════════════════════════════════════════════════════
+(function() {
+  // Load Leaflet CSS
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+  document.head.appendChild(link);
+
+  // Load Leaflet JS then init map
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+  script.onload = initGarciaMap;
+  document.head.appendChild(script);
+})();
+
+const MAP_PLACES = [
+  // Family Origins
+  { id:'camargo', lat:26.318, lng:-98.834, type:'origin', label:'Camargo, Tamaulipas',
+    desc:'Birthplace of Esteban Garcia (Dec 2, 1896) and ancestral home of the Garcia family. Eligio Garcia Treviño (b. ~1831) and son Amancio Garcia (b. April 1862) were both born here. Luis Garcia Longoria and Encarnación Garcia (born Treviño) — Esteban\'s great-grandparents — also based here. The Garcia family roots in Camargo trace to the town\'s 1749 founding under José de Escandón.' },
+  { id:'riogrande', lat:26.375, lng:-99.03, type:'origin', label:'Rio Grande City (Starr County Seat)',
+    desc:'The seat of Starr County, where the Garcia family\'s U.S. land holdings were centered. Esteban Garcia died here on February 7, 1988. The Garcia ranch at Artecitas was located near what is now La Grulla in Starr County.' },
+
+  // Ranches & Land Holdings
+  { id:'tacubaya', lat:27.08, lng:-98.42, type:'ranch', label:'Tacubaya Ranch (Brooks County)',
+    desc:'The Garcia family\'s primary ranch, located in Brooks County, Texas. Esteban took over management after his father Amancio died in 1923. The ranch was part of the original 250,000+ acre Spanish land grant. By 1940, Esteban and his brother Eligio Jr. had developed the finest Brahman herd in the United States here.' },
+  { id:'artecitas', lat:26.306, lng:-98.588, type:'ranch', label:'Artecitas Ranch & Cemetery (La Grulla, Starr Co.)',
+    desc:'<b>The Ranch:</b> Garcia family ranch on the banks of the Rio Grande, ~4 miles east of present-day La Grulla, Starr County. In 1913, Amancio Garcia moved the family here. Esteban left school in 6th grade to help manage it when his father fell gravely ill. Part of the original 250,000+ acre Spanish land grant. A 1935 Starr County map confirms the Artecitas Ranch by name in this location. Descendants report the land still belongs to the Garcia family (Esteban\'s mother and aunts), though it was described as abandoned as of 2017.<br><br><b>The Cemetery:</b> The Artecitas Ranch Cemetery sits on the former ranch grounds, ~4 miles east of La Grulla. It was discovered as a &quot;lost cemetery&quot; and identified through genealogy research. Known burials include the Ortiz family — Felipe Ortiz (rancher, 1900 Census) and his wife Anita Garcia Ortiz, their son Alberto Ortiz, and Tranquilina Ortiz Garza. Living descendants were found in Sullivan City, TX (~3 miles north). The cemetery is documented on Find a Grave and PeopleLegacy but has no permanent caretaker. The researcher who identified it noted Anita Garcia Ortiz may have been related to Esteban Garcia.' },
+  { id:'mcallen', lat:26.203, lng:-98.230, type:'ranch', label:'McAllen, Hidalgo County',
+    desc:'In 1935, Esteban moved his family to McAllen so his children could receive a proper education. He desegregated the McAllen public swimming pool after his children were denied entry — a landmark act of civil rights advocacy.' },
+
+  // Land Grants
+  { id:'las_animas', lat:27.28, lng:-98.70, type:'legal', label:'Las Animas Grant (Jim Hogg County)',
+    desc:'A 66,426-acre Spanish/Mexican land grant in Jim Hogg County originally granted to Nicolás and Bruno Garcia y Garza. The Garcia Longoria family — including Eligio Garcia Treviño, Francisco Garcia Treviño, and their parents Luis Garcia Longoria and Encarnación Treviño — are named as heirs in a February 14, 1935 title suit published in the Jim Hogg County Enterprise. This connects the Garcia family\'s land to an area spanning Starr, Brooks, AND Jim Hogg Counties.' },
+  { id:'grant_1740', lat:26.65, lng:-98.95, type:'legal', label:'Original 1740 Spanish Land Grant Area',
+    desc:'The approximate center of the Garcia family\'s original 1740 Royal Land Grant from the King of Spain — over 250,000 acres on both sides of the Rio Grande, encompassing what is now Starr and Brooks Counties, Texas, and extending into Tamaulipas, Mexico. Esteban\'s grandfather Eligio Garcia Treviño took over management of this grant in 1827.' },
+
+  // Key Events
+  { id:'artecitas_cem', lat:26.304, lng:-98.582, type:'event', label:'Artecitas Ranch Cemetery',
+    desc:'A small, largely forgotten ranch cemetery on the former Garcia land ~4 miles east of La Grulla. Identified as a &quot;lost cemetery&quot; in a genealogy video and later confirmed via death certificate research. Known to contain burials of the Ortiz family — workers or tenants on the Garcia ranch — including Felipe Ortiz, his wife Anita Garcia Ortiz, Alberto Ortiz, and Tranquilina Ortiz Garza. Not officially maintained. Documented on Find a Grave (Artesitas Ranch Cemetery, La Grulla, Starr County, TX). A Garcia family descendant confirmed in 2017 that the surrounding land still belongs to Esteban Garcia\'s family, though the ranch itself appeared abandoned. Sources: We Are Cousins blog (Nov 2011), Find a Grave memorial #176297912.' },
+  { id:'hebbronville', lat:27.306, lng:-98.690, type:'event', label:'Hebbronville (Jim Hogg Co. Seat)',
+    desc:'County seat of Jim Hogg County. The Jim Hogg County Enterprise newspaper, published here, ran a February 14, 1935 legal summons naming Luis Garcia Longoria, Encarnacion Trevino, Eligio Garcia Trevino, and Francisco Garcia Trevino as heirs to land in the Las Animas grant — providing key genealogical documentation of the Garcia family\'s land holdings.' },
+  { id:'kingsville', lat:27.516, lng:-97.856, type:'event', label:'Kingsville / King Ranch Area',
+    desc:'In 1931, Esteban Garcia helped Richard Kleberg of the King Ranch win a seat in the U.S. Congress — and used that political capital to win Mexican Americans the right to hold public dances in Brooks County. This political relationship with one of Texas\'s most powerful ranching families demonstrated Esteban\'s growing influence.' },
+  { id:'brasil', lat:-15.793, lng:-47.882, type:'event', label:'Brazil (Zebu Cattle Origin)',
+    desc:'In 1946, Esteban and his brother Eligio Garcia Jr. imported 13 Zebu (Bos indicus) Brahman cattle from Brazil — the first such importation of its kind. These animals eventually became a registered breed, and the Garcia brothers co-founded the Pan American Zebu Association (now the International Zebu Breeders Association) as a result.' },
+];
+
+let mapInstance = null;
+let allMarkers = [];
+
+function getColor(type) {
+  return { origin:'#e8d5a3', ranch:'#4a88d0', legal:'#c8860a', event:'#7a9a50' }[type] || '#aaa';
+}
+
+function initGarciaMap() {
+  mapInstance = L.map('garcia-map', {
+    center: [26.8, -98.8],
+    zoom: 7,
+    zoomControl: true,
+  });
+
+  // Dark tile layer
+  // Base layer: standard OSM shows state/county/country borders
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 19
+  }).addTo(mapInstance);
+
+  // Overlay: Stamen Toner Lines for extra border clarity
+  // County/state shading polygon layer
+  const txCountyStyle = { color: '#8B4513', weight: 1.5, fillOpacity: 0.08, fillColor: '#d4a855' };
+
+  // Highlight the 4 key counties as GeoJSON polygons (approximate bounding boxes)
+  const keyCounties = [
+    { name: 'Starr County, TX', coords: [[26.23,-99.48],[26.23,-98.50],[26.80,-98.50],[26.80,-99.48]] },
+    { name: 'Brooks County, TX', coords: [[26.80,-98.50],[26.80,-97.93],[27.27,-97.93],[27.27,-98.50]] },
+    { name: 'Jim Hogg County, TX', coords: [[27.00,-99.45],[27.00,-98.50],[27.57,-98.50],[27.57,-99.45]] },
+    { name: 'Hidalgo County, TX', coords: [[26.00,-98.81],[26.00,-97.87],[26.48,-97.87],[26.48,-98.81]] },
+  ];
+  keyCounties.forEach(c => {
+    const ring = c.coords.map(p => [p[0], p[1]]);
+    ring.push(ring[0]);
+    L.polygon(ring, { ...txCountyStyle, color:'#7a5c2a' })
+      .addTo(mapInstance)
+      .bindTooltip(c.name, { direction:'center', className:'county-tip' });
+  });
+
+  // Add Rio Grande rough line (TX-Mexico border in this region)
+  const rioGrandePath = [
+    [26.26, -97.69], [26.29, -98.0], [26.32, -98.29], [26.35, -98.55],
+    [26.38, -98.82], [26.44, -99.1], [26.52, -99.35], [26.67, -99.58],
+    [27.0, -99.72], [27.27, -99.95], [27.5, -100.1]
+  ];
+  L.polyline(rioGrandePath, { color: '#4a88d0', weight: 2, opacity: 0.5, dashArray: '4 4' })
+    .addTo(mapInstance)
+    .bindTooltip('Rio Grande / Río Bravo', { permanent: false, direction: 'top' });
+
+  // Add markers
+  MAP_PLACES.forEach(place => {
+    const color = getColor(place.type);
+    const markerHtml = `<div style="
+      width:14px;height:14px;border-radius:50%;
+      background:${color};
+      border:2px solid rgba(0,0,0,0.5);
+      box-shadow:0 0 6px ${color}88;
+    "></div>`;
+
+    const icon = L.divIcon({ html: markerHtml, className: '', iconSize: [14,14], iconAnchor: [7,7] });
+    const marker = L.marker([place.lat, place.lng], { icon })
+      .addTo(mapInstance)
+      .bindPopup(`
+        <div style="min-width:220px;max-width:280px;font-family:Georgia,serif;">
+          <div style="font-weight:bold;font-size:0.95rem;margin-bottom:6px;color:#222;">${place.label}</div>
+          <div style="font-size:0.82rem;color:#444;line-height:1.5;">${place.desc}</div>
+        </div>
+      `, { maxWidth: 300 });
+
+    marker._placeType = place.type;
+    allMarkers.push(marker);
+  });
+}
+
+window.filterMap = function(type) {
+  // Update button styles
+  ['all','ranch','origin','legal'].forEach(t => {
+    const btn = document.getElementById('btn-' + t);
+    if (btn) {
+      btn.style.background = (t === type) ? '#4a88d0' : '#2a2a4a';
+      btn.style.color = (t === type) ? '#fff' : '#aaa';
+    }
+  });
+
+  allMarkers.forEach(m => {
+    if (type === 'all' || m._placeType === type || (type === 'legal' && m._placeType === 'legal')) {
+      m.addTo(mapInstance);
+    } else {
+      mapInstance.removeLayer(m);
+    }
+  });
+};
+
+</script>
+</body>
+</html>
